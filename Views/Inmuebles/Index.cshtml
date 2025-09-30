@@ -1,0 +1,109 @@
+@model PortalInmobiliario.Models.InmuebleFilterViewModel
+
+@{
+    ViewData["Title"] = "Catálogo de Inmuebles";
+}
+
+<h2>Catálogo de Inmuebles</h2>
+
+<!-- Formulario de Filtros -->
+<form method="get" asp-action="Index" class="row g-3 mb-4">
+    <div class="col-md-3">
+        <label class="form-label">Ciudad</label>
+        <select asp-for="Ciudad" class="form-select">
+            <option value="">Todas las ciudades</option>
+            @foreach (var ciudad in Model.Ciudades)
+            {
+                <option value="@ciudad">@ciudad</option>
+            }
+        </select>
+    </div>
+    
+    <div class="col-md-3">
+        <label class="form-label">Tipo</label>
+        <select asp-for="Tipo" class="form-select">
+            <option value="">Todos los tipos</option>
+            @foreach (var tipo in Model.Tipos)
+            {
+                <option value="@tipo">@tipo</option>
+            }
+        </select>
+    </div>
+    
+    <div class="col-md-2">
+        <label class="form-label">Precio Mín.</label>
+        <input asp-for="PrecioMin" type="number" class="form-control" min="0" placeholder="Mínimo">
+        <span asp-validation-for="PrecioMin" class="text-danger"></span>
+    </div>
+    
+    <div class="col-md-2">
+        <label class="form-label">Precio Máx.</label>
+        <input asp-for="PrecioMax" type="number" class="form-control" min="0" placeholder="Máximo">
+        <span asp-validation-for="PrecioMax" class="text-danger"></span>
+    </div>
+    
+    <div class="col-md-2">
+        <label class="form-label">Dormitorios</label>
+        <input asp-for="Dormitorios" type="number" class="form-control" min="0" placeholder="Mínimo">
+    </div>
+    
+    <div class="col-12">
+        <button type="submit" class="btn btn-primary">Filtrar</button>
+        <a asp-action="Index" class="btn btn-secondary">Limpiar</a>
+    </div>
+</form>
+
+
+<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+
+@if (Model.Inmuebles.Any())
+{
+    <div class="row">
+        @foreach (var inmueble in Model.Inmuebles)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <img src="@inmueble.Imagen" class="card-img-top" alt="@inmueble.Titulo" style="height: 200px; object-fit: cover;">
+                    <div class="card-body">
+                        <h5 class="card-title">@inmueble.Titulo</h5>
+                        <p class="card-text">
+                            <strong>@inmueble.Ciudad</strong><br>
+                            @inmueble.Tipo · @inmueble.Dormitorios dorm. · @inmueble.Banos baños<br>
+                            <strong>@inmueble.Precio.ToString("C")</strong>
+                        </p>
+                        <a asp-action="Details" asp-route-id="@inmueble.Id" class="btn btn-primary">Ver Detalles</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- Paginación -->
+    @if (Model.TotalPaginas > 1)
+    {
+        <nav>
+            <ul class="pagination">
+                @for (int i = 1; i <= Model.TotalPaginas; i++)
+                {
+                    <li class="page-item @(i == Model.Pagina ? "active" : "")">
+                        <a class="page-link" 
+                           asp-action="Index" 
+                           asp-route-ciudad="@Model.Ciudad"
+                           asp-route-tipo="@Model.Tipo"
+                           asp-route-precioMin="@Model.PrecioMin"
+                           asp-route-precioMax="@Model.PrecioMax"
+                           asp-route-dormitorios="@Model.Dormitorios"
+                           asp-route-pagina="@i">@i</a>
+                    </li>
+                }
+            </ul>
+        </nav>
+    }
+}
+else
+{
+    <div class="alert alert-warning">
+        No se encontraron inmuebles con los filtros seleccionados.
+    </div>
+}

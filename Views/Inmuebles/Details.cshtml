@@ -1,0 +1,58 @@
+@model PortalInmobiliario.Models.Inmueble
+
+@{
+    ViewData["Title"] = "Detalles del Inmueble";
+}
+
+<h2>@Model.Titulo</h2>
+
+<!-- Mostrar mensajes de éxito/error -->
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+
+<div class="row">
+    <div class="col-md-6">
+        <img src="@Model.Imagen" class="img-fluid" alt="@Model.Titulo">
+    </div>
+    <div class="col-md-6">
+        <h4>Información del Inmueble</h4>
+        <p><strong>Ciudad:</strong> @Model.Ciudad</p>
+        <p><strong>Dirección:</strong> @Model.Direccion</p>
+        <p><strong>Tipo:</strong> @Model.Tipo</p>
+        <p><strong>Dormitorios:</strong> @Model.Dormitorios</p>
+        <p><strong>Baños:</strong> @Model.Banos</p>
+        <p><strong>Metros Cuadrados:</strong> @Model.MetrosCuadrados m²</p>
+        <p><strong>Precio:</strong> <span class="text-success h4">@Model.Precio.ToString("C")</span></p>
+        
+        <div class="mt-4">
+            <!-- Botón Agendar Visita -->
+            <a asp-controller="Visitas" asp-action="Create" asp-route-inmuebleId="@Model.Id" 
+               class="btn btn-success btn-lg">Agendar Visita</a>
+            
+            <!-- Botón Reservar (solo si no hay reserva activa) -->
+            @{
+                var tieneReservaActiva = ViewBag.TieneReservaActiva as bool? ?? false;
+            }
+            
+            @if (!tieneReservaActiva)
+            {
+                <form asp-controller="Reservas" asp-action="Create" method="post" class="d-inline">
+                    <input type="hidden" name="inmuebleId" value="@Model.Id" />
+                    <button type="submit" class="btn btn-warning btn-lg">Reservar por 48h</button>
+                </form>
+            }
+            else
+            {
+                <button class="btn btn-secondary btn-lg" disabled>Ya Reservado</button>
+            }
+            
+            <a asp-action="Index" class="btn btn-primary">Volver al Catálogo</a>
+        </div>
+    </div>
+</div>
